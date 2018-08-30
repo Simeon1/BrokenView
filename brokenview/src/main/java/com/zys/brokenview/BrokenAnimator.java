@@ -21,6 +21,7 @@ import android.view.animation.AccelerateInterpolator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 class BrokenAnimator extends ValueAnimator{
 
@@ -502,13 +503,24 @@ class BrokenAnimator extends ValueAnimator{
         }
         return canReverse;
     }
+    private HashMap<Integer,Float> stageToPercentageMap = new HashMap<>();
+
     public boolean draw(Canvas canvas) {
 
         if (!isStarted()) {
             return false;
         }
 
-        float fraction = getAnimatedFraction();
+        float whatAndroidThinksThePercentageIs = getAnimatedFraction();
+
+        if (stageToPercentageMap.get(getStage()) == null ||
+                stageToPercentageMap.get(getStage()) < whatAndroidThinksThePercentageIs)
+        {
+            stageToPercentageMap.put(getStage(),whatAndroidThinksThePercentageIs);
+        }
+
+        float fraction = stageToPercentageMap.get(getStage());
+
         if(getStage() == STAGE_BREAKING) {
             canvas.save();
             canvas.translate(mTouchPoint.x, mTouchPoint.y);
